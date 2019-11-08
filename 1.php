@@ -1,5 +1,5 @@
 <?php
-include ("function.php");
+include ("2.php");
 function nama()
 	{
 	$ch = curl_init();
@@ -89,35 +89,35 @@ function claim($token)
 		return false;
 		}
 	}
-echo "Choose Login or Register? Login = 1 & Register = 2: ";
+echo "\\ Suport Kholid dengan doa //mlebu mentu enak? mlebu = yo & lboke = ojo : ";
 $type = trim(fgets(STDIN));
-if($type == 2){
-echo "It's Register Way\n";
-echo "Input 62 For ID and 1 For US Phone Number\n";
-echo "Enter Number: ";
+if($type == yo){
+echo "gari gawe \n";
+echo "alah tinggal ketik\n";
+echo "nomer e piro: ";
 $nope = trim(fgets(STDIN));
 $register = register($nope);
 if ($register == false)
 	{
-	echo "Failed to Get OTP, Use Unregistered Number!\n";
+	echo "kurang frees ngogolek neh\n";
 	}
   else
 	{
-	echo "Enter Your OTP: ";
-	// echo "Enter Number: ";
+	echo "OTPne : ";
+	// echo "nomer e piro: ";
 	$otp = trim(fgets(STDIN));
 	$verif = verif($otp, $register);
 	if ($verif == false)
 		{
-		echo "Failed to Registering Your Number!\n";
+		echo "kurang frees ngogolek neh\n";
 		}
 	  else
 		{
-		echo "Ready to Claim\n";
+		echo "gari mangan jo lali bagi\n";
 		$claim = claim($verif);
 		if ($claim == false)
 			{
-			echo "Failed to Claim Voucher, Try to Claim Manually\n";
+			echo "nomermu elek kok koe\n";
 			}
 		  else
 			{
@@ -126,32 +126,32 @@ if ($register == false)
 		}
 	}
 }else if($type == 1){
-echo "It's Login Way\n";
-echo "Input 62 For ID and 1 For US Phone Number\n";
-echo "Enter Number: ";
+echo "neko neko \n";
+echo "kilogin\n";
+echo "nomer e: ";
 $nope = trim(fgets(STDIN));
 $login = login($nope);
 if ($login == false)
 	{
-	echo "Failed to Get OTP!\n";
+	echo "ra iso mlebu otpne\n";
 	}
   else
 	{
-	echo "Enter Your OTP: ";
-	// echo "Enter Number: ";
+	echo "otpne: ";
+	// echo "nomer e: ";
 	$otp = trim(fgets(STDIN));
 	$verif = veriflogin($otp, $login);
 	if ($verif == false)
 		{
-		echo "Failed to Login with Your Number!\n";
+		echo "nomermu elek\n";
 		}
 	  else
 		{
-		echo "Ready to Claim\n";
+		echo "mangane ojo lali bagi\n";
 		$claim = claim($verif);
 		if ($claim == false)
 			{
-			echo "Failed to Claim Voucher, Try to Claim Manually\n";
+			echo "nangis wae\n";
 			}
 		  else
 			{
