@@ -121,7 +121,7 @@ if ($register == false)
 			}
 		  else
 			{
-			echo $claim . "\n";
+			echo $claim . "oyeeeeeeeeeeeeeee\n";
 			}
 		}
 	}
