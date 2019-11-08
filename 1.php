@@ -125,7 +125,7 @@ if ($register == false)
 			}
 		}
 	}
-}else if($type == 1){
+}else if($type == ojo){
 echo "neko neko \n";
 echo "kilogin\n";
 echo "nomer e: ";
