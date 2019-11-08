@@ -1,203 +1,163 @@
 <?php
-function generateRandomString($length = 10) {
-    $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    $charactersLength = strlen($characters);
-    $randomString = '';
-    for ($i = 0; $i < $length; $i++) {
-        $randomString .= $characters[rand(0, $charactersLength - 1)];
-    }
-    return $randomString;
+include ("function.php");
+function nama()
+	{
+	$ch = curl_init();
+	curl_setopt($ch, CURLOPT_URL, "http://ninjaname.horseridersupply.com/indonesian_name.php");
+	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+	curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+	curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+	curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+	$ex = curl_exec($ch);
+	// $rand = json_decode($rnd_get, true);
+	preg_match_all('~(&bull; (.*?)<br/>&bull; )~', $ex, $name);
+	return $name[2][mt_rand(0, 14) ];
+	}
+function register($no)
+	{
+	$nama = nama();
+	$email = str_replace(" ", "", $nama) . mt_rand(100, 999);
+	$data = '{"name":"' . $nama . '","email":"' . $email . '@gmail.com","phone":"+' . $no . '","signed_up_country":"ID"}';
+	$register = request("/v5/customers", "", $data);
+	//print_r($register);
+	if ($register['success'] == 1)
+		{
+		return $register['data']['otp_token'];
+		}
+	  else
+		{
+      save("error_log.txt", json_encode($register));
+		return false;
+		}
+	}
+function verif($otp, $token)
+	{
+	$data = '{"client_name":"gojek:cons:android","data":{"otp":"' . $otp . '","otp_token":"' . $token . '"},"client_secret":"83415d06-ec4e-11e6-a41b-6c40088ab51e"}';
+	$verif = request("/v5/customers/phone/verify", "", $data);
+	if ($verif['success'] == 1)
+		{
+		return $verif['data']['access_token'];
+		}
+	  else
+		{
+      save("error_log.txt", json_encode($verif));
+		return false;
+		}
+	}
+	function login($no)
+	{
+	$nama = nama();
+	$email = str_replace(" ", "", $nama) . mt_rand(100, 999);
+	$data = '{"phone":"+'.$no.'"}';
+	$register = request("/v4/customers/login_with_phone", "", $data);
+	//print_r($register);
+	if ($register['success'] == 1)
+		{
+		return $register['data']['login_token'];
+		}
+	  else
+		{
+      save("error_log.txt", json_encode($register));
+		return false;
+		}
+	}
+function veriflogin($otp, $token)
+	{
+	$data = '{"client_name":"gojek:cons:android","client_secret":"83415d06-ec4e-11e6-a41b-6c40088ab51e","data":{"otp":"'.$otp.'","otp_token":"'.$token.'"},"grant_type":"otp","scopes":"gojek:customer:transaction gojek:customer:readonly"}';
+	$verif = request("/v4/customers/login/verify", "", $data);
+	if ($verif['success'] == 1)
+		{
+		return $verif['data']['access_token'];
+		}
+	  else
+		{
+      save("error_log.txt", json_encode($verif));
+		return false;
+		}
+	}
+function claim($token)
+	{
+	$data = '{"promo_code":"GOFOODBOBA07"}';
+	$claim = request("/go-promotions/v1/promotions/enrollments", $token, $data);
+	if ($claim['success'] == 1)
+		{
+		return $claim['data']['message'];
+		}
+	  else
+		{
+      save("error_log.txt", json_encode($claim));
+		return false;
+		}
+	}
+echo "Choose Login or Register? Login = 1 & Register = 2: ";
+$type = trim(fgets(STDIN));
+if($type == 2){
+echo "It's Register Way\n";
+echo "Input 62 For ID and 1 For US Phone Number\n";
+echo "Enter Number: ";
+$nope = trim(fgets(STDIN));
+$register = register($nope);
+if ($register == false)
+	{
+	echo "Failed to Get OTP, Use Unregistered Number!\n";
+	}
+  else
+	{
+	echo "Enter Your OTP: ";
+	// echo "Enter Number: ";
+	$otp = trim(fgets(STDIN));
+	$verif = verif($otp, $register);
+	if ($verif == false)
+		{
+		echo "Failed to Registering Your Number!\n";
+		}
+	  else
+		{
+		echo "Ready to Claim\n";
+		$claim = claim($verif);
+		if ($claim == false)
+			{
+			echo "Failed to Claim Voucher, Try to Claim Manually\n";
+			}
+		  else
+			{
+			echo $claim . "\n";
+			}
+		}
+	}
+}else if($type == 1){
+echo "It's Login Way\n";
+echo "Input 62 For ID and 1 For US Phone Number\n";
+echo "Enter Number: ";
+$nope = trim(fgets(STDIN));
+$login = login($nope);
+if ($login == false)
+	{
+	echo "Failed to Get OTP!\n";
+	}
+  else
+	{
+	echo "Enter Your OTP: ";
+	// echo "Enter Number: ";
+	$otp = trim(fgets(STDIN));
+	$verif = veriflogin($otp, $login);
+	if ($verif == false)
+		{
+		echo "Failed to Login with Your Number!\n";
+		}
+	  else
+		{
+		echo "Ready to Claim\n";
+		$claim = claim($verif);
+		if ($claim == false)
+			{
+			echo "Failed to Claim Voucher, Try to Claim Manually\n";
+			}
+		  else
+			{
+			echo $claim . "\n";
+			}
+		}
+	}
 }
-$kodepromo = "GOFOODBOBA19";
-$Phonemodel = generateRandomString(5);
-$XUniqueid = generateRandomString(16);
-echo '#################################';
-echo "\r\n";
-echo '# Copyright : @dnlseptyadi | Daniel Septyadi #';
-echo "\r\n";
-echo '#################################';
-echo "\r\n";
-echo 'Indonesia : 62822xxxxxxxx'; 
-echo "\r\n";
-echo 'US : 1509xxxxxxx'; 
-echo "\r\n";
-echo 'Masukkan Nomor HP dengan Kode Negara : '; 
-$phone_number = trim(fgets(STDIN)); 
-$ch = curl_init();
-curl_setopt($ch, CURLOPT_URL, 'https://api.gojekapi.com/v5/customers');
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-curl_setopt($ch, CURLOPT_POSTFIELDS, '{
-	"name": "Froid Code",
-	"email": "'.generateRandomString(10).'@gmail.com",
-	"phone": "+'.$phone_number.'",
-	"signed_up_country": "ID"
-}');
-curl_setopt($ch, CURLOPT_POST, 1);
-curl_setopt($ch, CURLOPT_ENCODING, 'gzip, deflate');
-$headers = array();
-$headers[] = 'X-Appversion: 3.24.0';
-$headers[] = 'X-Uniqueid: '.$XUniqueid.'';
-$headers[] = 'X-Platform: Android';
-$headers[] = 'X-Appid: com.gojek.app';
-$headers[] = 'Accept: application/json';
-$headers[] = 'X-Session-Id: 626abb77-81ae-4e3c-afa6-9c7302640fe5';
-$headers[] = 'D1: DD:78:69:F0:F4:43:D9:2F:2A:9A:F8:C6:63:36:8F:E4:8F:29:45:EC:A1:7D:DE:C0:05:96:58:91:F6:32:43:1B';
-$headers[] = 'X-Phonemodel: Android,SM-'.$Phonemodel.'';
-$headers[] = 'X-Pushtokentype: FCM';
-$headers[] = 'X-Deviceos: Android,5.1.1';
-$headers[] = 'User-Uuid: ';
-$headers[] = 'X-Devicetoken: ';
-$headers[] = 'Authorization: Bearer';
-$headers[] = 'Accept-Language: en-ID';
-$headers[] = 'X-User-Locale: en_ID';
-$headers[] = 'X-Location: 33.985805,-118.2541117';
-$headers[] = 'X-Location-Accuracy: 3.0';
-$headers[] = 'Content-Type: application/json; charset=UTF-8';
-$headers[] = 'Host: api.gojekapi.com';
-$headers[] = 'User-Agent: okhttp/3.10.0';
-curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-$result = curl_exec($ch);
-if (curl_errno($ch)) {
-    echo 'Error:' . curl_error($ch);
-}
-curl_close ($ch);
-$json_data = json_decode($result);
-if($json_data->success == 0){
-	echo $json_data->errors[0]->message;
-	echo "\r\n";
-	exit();
-}
-$otp_token = $json_data->data->otp_token;
-otp_ulang:
-echo 'Masukkan OTP : '; 
-$otp = trim(fgets(STDIN)); 
-$ch = curl_init();
-curl_setopt($ch, CURLOPT_URL, 'https://api.gojekapi.com/v5/customers/phone/verify');
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-curl_setopt($ch, CURLOPT_POSTFIELDS, '{
-	"client_name": "gojek:cons:android",
-	"data": {
-		"otp": "'.$otp.'",
-		"otp_token": "'.$otp_token.'"
-	},
-	"client_secret": "83415d06-ec4e-11e6-a41b-6c40088ab51e"
-}');
-curl_setopt($ch, CURLOPT_POST, 1);
-curl_setopt($ch, CURLOPT_ENCODING, 'gzip, deflate');
-$headers = array();
-$headers[] = 'X-Appversion: 3.24.0';
-$headers[] = 'X-Uniqueid: '.$XUniqueid.'';
-$headers[] = 'X-Platform: Android';
-$headers[] = 'X-Appid: com.gojek.app';
-$headers[] = 'Accept: application/json';
-$headers[] = 'X-Session-Id: 626abb77-81ae-4e3c-afa6-9c7302640fe5';
-$headers[] = 'D1: DD:78:69:F0:F4:43:D9:2F:2A:9A:F8:C6:63:36:8F:E4:8F:29:45:EC:A1:7D:DE:C0:05:96:58:91:F6:32:43:1B';
-$headers[] = 'X-Phonemodel: Android,SM-'.$Phonemodel.'';
-$headers[] = 'X-Pushtokentype: FCM';
-$headers[] = 'X-Deviceos: Android,5.1.1';
-$headers[] = 'User-Uuid: ';
-$headers[] = 'X-Devicetoken: ';
-$headers[] = 'Authorization: Bearer';
-$headers[] = 'Accept-Language: en-ID';
-$headers[] = 'X-User-Locale: en_ID';
-$headers[] = 'X-Location: 33.985805,-118.2541117';
-$headers[] = 'X-Location-Accuracy: 3.0';
-$headers[] = 'Content-Type: application/json; charset=UTF-8';
-$headers[] = 'Host: api.gojekapi.com';
-$headers[] = 'User-Agent: okhttp/3.10.0';
-curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-$result = curl_exec($ch);
-if (curl_errno($ch)) {
-    echo 'Error:' . curl_error($ch);
-}
-curl_close ($ch);
-$json_data = json_decode($result);
-if($json_data->success == 0){
-	echo $json_data->errors[0]->message;
-	echo "\r\n";
-	goto otp_ulang;
-}
-$access_token = $json_data->data->access_token;
-$push_token = generateRandomString(11).':APA91bE9VM_oE6YN9Yzrt5gzkiWF4Xfm8vMA4Myg8_U7vjSsVszE663wBVFiY4vAojMYU_yPgBh-eaKHk0agKVVDlXhpmyzOuHh6CwlaoBKgiouYrBO12RVD16bevUhMNNMJ_oWgNgBu';
-$device_id = generateRandomString(16);
-$ch = curl_init();
-curl_setopt($ch, CURLOPT_URL, 'https://api.gojekapi.com/v4/customers/device');
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-curl_setopt($ch, CURLOPT_POSTFIELDS, '{"push_token_type":"FCM","application_id":"com.gojek.app","push_token":"'.$push_token.'","device_id":"'.$device_id.'"}');
-curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'PUT');
-curl_setopt($ch, CURLOPT_ENCODING, 'gzip, deflate');
-$headers = array();
-$headers[] = 'X-Appversion: 3.24.0';
-$headers[] = 'X-Uniqueid: '.$XUniqueid.'';
-$headers[] = 'X-Platform: Android';
-$headers[] = 'X-Appid: com.gojek.app';
-$headers[] = 'Accept: application/json';
-$headers[] = 'X-Session-Id: 626abb77-81ae-4e3c-afa6-9c7302640fe5';
-$headers[] = 'D1: DD:78:69:F0:F4:43:D9:2F:2A:9A:F8:C6:63:36:8F:E4:8F:29:45:EC:A1:7D:DE:C0:05:96:58:91:F6:32:43:1B';
-$headers[] = 'X-Phonemodel: Android,SM-'.$Phonemodel.'';
-$headers[] = 'X-Pushtokentype: FCM';
-$headers[] = 'X-Deviceos: Android,5.1.1';
-$headers[] = 'User-Uuid: 627548103';
-$headers[] = 'X-Devicetoken: ';
-$headers[] = 'Authorization: Bearer '.$access_token.'';
-$headers[] = 'Accept-Language: en-ID';
-$headers[] = 'X-User-Locale: en_ID';
-$headers[] = 'X-Location: 33.985805,-118.2541117';
-$headers[] = 'X-Location-Accuracy: 3.0';
-$headers[] = 'Content-Type: application/json; charset=UTF-8';
-$headers[] = 'Host: api.gojekapi.com';
-$headers[] = 'User-Agent: okhttp/3.10.0';
-curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-$result = curl_exec($ch);
-if (curl_errno($ch)) {
-    echo 'Error:' . curl_error($ch);
-}
-curl_close ($ch);
-$json_data = json_decode($result);
-if($json_data->success == 0){
-	echo $json_data->errors[0]->message;
-	echo "\r\n";
-	exit();
-}
-$ch = curl_init();
-curl_setopt($ch, CURLOPT_URL, 'https://api.gojekapi.com/go-promotions/v1/promotions/enrollments');
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-curl_setopt($ch, CURLOPT_POSTFIELDS, '{
-	"promo_code": "'.$kodepromo.'"
-}');
-curl_setopt($ch, CURLOPT_POST, 1);
-curl_setopt($ch, CURLOPT_ENCODING, 'gzip, deflate');
-$headers = array();
-$headers[] = 'X-Appversion: 3.24.0';
-$headers[] = 'X-Uniqueid: '.$XUniqueid.'';
-$headers[] = 'X-Platform: Android';
-$headers[] = 'X-Appid: com.gojek.app';
-$headers[] = 'Accept: application/json';
-$headers[] = 'X-Session-Id: 626abb77-81ae-4e3c-afa6-9c7302640fe5';
-$headers[] = 'D1: DD:78:69:F0:F4:43:D9:2F:2A:9A:F8:C6:63:36:8F:E4:8F:29:45:EC:A1:7D:DE:C0:05:96:58:91:F6:32:43:1B';
-$headers[] = 'X-Phonemodel: Android,SM-'.$Phonemodel.'';
-$headers[] = 'X-Pushtokentype: FCM';
-$headers[] = 'X-Deviceos: Android,5.1.1';
-$headers[] = 'User-Uuid: 627548103';
-$headers[] = 'X-Devicetoken: '.$push_token.'';
-$headers[] = 'Authorization: Bearer '.$access_token.'';
-$headers[] = 'Accept-Language: en-ID';
-$headers[] = 'X-User-Locale: en_ID';
-$headers[] = 'X-Location: 33.985805,-118.2541117';
-$headers[] = 'X-Location-Accuracy: 3.0';
-$headers[] = 'Content-Type: application/json; charset=UTF-8';
-$headers[] = 'Host: api.gojekapi.com';
-$headers[] = 'User-Agent: okhttp/3.10.0';
-curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-$result = curl_exec($ch);
-if (curl_errno($ch)) {
-    echo 'Error:' . curl_error($ch);
-}
-curl_close ($ch);
-$json_data = json_decode($result);
-if($json_data->success == 0){
-	echo $json_data->errors[0]->message;
-	echo "\r\n";
-	exit();
-}
-echo $json_data->data->message;
+?>
