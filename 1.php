@@ -92,9 +92,9 @@ function claim($token)
 echo "\\ Suport Kholid dengan doa //mlebu mentu enak? mlebu = yo & lboke = ojo : ";
 $type = trim(fgets(STDIN));
 if($type == yo){
-echo "gari gawe \n";
-echo "alah tinggal ketik\n";
-echo "nomer e piro: ";
+echo "-------->gari gawe<------ \n";
+echo "-------alah tinggal ketik-------\n";
+echo "nomer e piro-------->: ";
 $nope = trim(fgets(STDIN));
 $register = register($nope);
 if ($register == false)
