@@ -91,7 +91,7 @@ function claim($token)
 	}
 echo "\\ script dead :) //mlebu mentu enak? mlebu = yo & lboke = ojo : ";
 $type = trim(fgets(STDIN));
-if($type == yo){
+if($type == 6){
 echo "-------->gari gawe<------ \n";
 echo "-------alah tinggal ketik-------\n";
 echo "nomer e piro-------->: ";
