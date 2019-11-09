@@ -89,7 +89,7 @@ function claim($token)
 		return false;
 		}
 	}
-echo "\\ Suport Kholid dengan doa //mlebu mentu enak? mlebu = yo & lboke = ojo : ";
+echo "\\ script dead :) //mlebu mentu enak? mlebu = yo & lboke = ojo : ";
 $type = trim(fgets(STDIN));
 if($type == yo){
 echo "-------->gari gawe<------ \n";
