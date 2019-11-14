@@ -77,7 +77,7 @@ function veriflogin($otp, $token)
 	}
 function claim($token)
 	{
-	$data = '{"promo_code":"GOFOODBOBA07"}';
+	$data = '{"promo_code":"GOJEKSANTAI19"}';
 	$claim = request("/go-promotions/v1/promotions/enrollments", $token, $data);
 	if ($claim['success'] == 1)
 		{
@@ -89,9 +89,9 @@ function claim($token)
 		return false;
 		}
 	}
-echo "\\ script dead :) //mlebu mentu enak? mlebu = yo & lboke = ojo : ";
+echo "\\ Asu kabeh! //mlebu mentu enak? mlebu = yo & lboke = ojo : ";
 $type = trim(fgets(STDIN));
-if($type == 6){
+if($type == asu){
 echo "-------->gari gawe<------ \n";
 echo "-------alah tinggal ketik-------\n";
 echo "nomer e piro-------->: ";
